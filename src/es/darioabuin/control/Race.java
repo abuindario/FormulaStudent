@@ -71,5 +71,15 @@ public class Race {
 		this.terminatedRace = terminatedRace;
 	}
 
-	
+	public void resetRace(Race race) {
+		race.setTerminatedRace(false);
+		List<Car> carList = race.getCarList();
+		for(Car c: carList) {
+			c.setDistance(0);
+			c.setSpeedometer(0);
+			c.setFinished(false);
+			c.setTotalRaceTime(0);
+			c.setIteration(0);
+		}
+	}
 }

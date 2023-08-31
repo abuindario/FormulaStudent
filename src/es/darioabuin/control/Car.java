@@ -3,7 +3,7 @@ package es.darioabuin.control;
 public class Car {
 	private String brand;
 	private String model;
-	private String garage;
+	private Garage garage;
 	private int speedometer = 0;
 	private int distance = 0;
 	private double totalRaceTime = 0;
@@ -12,6 +12,7 @@ public class Car {
 	private final int ITERATION_SECONDS = 20;
 	private boolean finished = false;
 	private final int MAX_SPEED = 200;
+	private int score = 0;
 
 	public Car(String brand, String model) {
 		this.brand = brand;
@@ -34,6 +35,14 @@ public class Car {
 		this.model = model;
 	}
 
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
 	public int getDistance() {
 		return distance;
 	}
@@ -42,10 +51,18 @@ public class Car {
 		this.distance = distance;
 	}
 	
+	public void setIteration(int it) {
+		this.iteration = it;
+	}
+	
 	public int getSpeedometer() {
 		return speedometer;
 	}
 
+	public void setSpeedometer(int speed) {
+		this.speedometer = speed;
+	}
+	
 	public double getTotalRaceTime() {
 		return totalRaceTime;
 	}
@@ -62,11 +79,11 @@ public class Car {
 		this.finished = finished;
 	}
 
-	public String getGarage() {
+	public Garage getGarage() {
 		return garage;
 	}
 
-	public void registerGarage(String garage) {
+	public void registerGarage(Garage garage) {
 		this.garage = garage;
 	}
 

@@ -1,12 +1,15 @@
 package es.darioabuin.control;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
+import es.darioabuin.util.CarComparator;
+
 public class Control {
-	public List<Car> cars = new ArrayList<Car>();
 	public List<Garage> garages = new ArrayList<Garage>();
 	public List<Race> races = new ArrayList<Race>();
 
@@ -28,10 +31,10 @@ public class Control {
 		Car car4 = new Car("Ferraro", "Gemma");
 
 		// Register cars in their garage
-		garage1.registerCarInGarage(car1);
-		garage1.registerCarInGarage(car2);
-		garage2.registerCarInGarage(car3);
-		garage2.registerCarInGarage(car4);
+		garage1.registerCarInGarage(car1, garage1);
+		garage1.registerCarInGarage(car2, garage1);
+		garage2.registerCarInGarage(car3, garage2);
+		garage2.registerCarInGarage(car4, garage2);
 
 		// Race creation: name + length of each lap + number of laps
 		Race race1 = new Race("Race 1", 2000, 3);
@@ -41,19 +44,15 @@ public class Control {
 		control.races.add(race1);
 		control.races.add(race2);
 
-		control.start();
+		// Register garages and cars in race
+		race1.registerGarageInRace(garage1);
+		race1.registerGarageInRace(garage2);
+		race1.registerCarInRace(car1);
+		race1.registerCarInRace(car2);
+		race1.registerCarInRace(car3);
+		race1.registerCarInRace(car4);
 
-//		// Register cars in race
-//		race1.registerCarInRace(car1);
-//		race1.registerCarInRace(car2);
-//		race1.registerCarInRace(car3);
-//		race1.registerCarInRace(car4);
-//		
-//		// Register garages in race
-//		race1.registerGarageInRace(garage1);
-//		race1.registerGarageInRace(garage2);
-//		
-//		race1.startRace();
+		control.start();
 	}
 
 	public void start() {
@@ -235,7 +234,7 @@ public class Control {
 		System.out.println("Enter car model:");
 		String model = scan.nextLine();
 		Car car = new Car(brand, model);
-		garage.registerCarInGarage(car);
+		garage.registerCarInGarage(car, garage);
 	}
 
 	private void removeCarFromGarage(Garage garage) {
@@ -256,8 +255,6 @@ public class Control {
 		int select = scan.nextInt();
 		garages.remove(select - 1);
 	}
-// COMPROBAR QUE CUANDO SE ELIMINA UNA ESCUDERÍA, SE ELIMINE
-// TAMBIÉN DE LAS CARRERAS Y TORNEOS
 
 	private void raceMenu() {
 		int opt = 99;
@@ -317,6 +314,7 @@ public class Control {
 	}
 
 	private void showRaceDetails() {
+		System.out.println("Select one option: ");
 		listRaces();
 		Scanner scan = new Scanner(System.in);
 		int select = 0;
@@ -325,9 +323,14 @@ public class Control {
 			try {
 				Race race = races.get(select - 1);
 				int i = 1;
+				int j = 1;
 				for (Garage g : race.getGarageList()) {
-					System.out.println(i + ". " + g.getGarageName());
+					System.out.println("Garage " + i + ". " + g.getGarageName() + "\n\tCars of the garage: ");
 					i++;
+					for (Car c : g.getCarList()) {
+						System.out.println("\t" + j + ". " + c.getBrand() + " " + c.getModel());
+						j++;
+					}
 				}
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
@@ -339,11 +342,14 @@ public class Control {
 
 	private void startRace() {
 		listRaces();
+		System.out.println("Select a race: ");
 		Scanner scan = new Scanner(System.in);
+		DecimalFormat dfor = new DecimalFormat("#.00");
 		try {
 			int select = scan.nextInt();
 			try {
 				Race race = races.get(select - 1);
+				race.resetRace(race);
 				do {
 					int finished = 0;
 					for (Car c : race.getCarList()) {
@@ -354,9 +360,10 @@ public class Control {
 						} else {
 							int minutes = (int) (c.getTotalRaceTime() / 60);
 							int seconds = (int) (c.getTotalRaceTime() % 60);
-							System.out.println(c.getModel() + " ha finalizado la carrera en " + c.getTotalRaceTime()
-									+ "s, " + minutes + ":" + seconds + "; media km/h: "
-									+ (race.getTotalLength() / c.getTotalRaceTime() / 1000 * 3600));
+							System.out.println(
+									c.getModel() + " finished the race in " + minutes + ":" + seconds + "; average: "
+											+ dfor.format((race.getTotalLength() / c.getTotalRaceTime() / 1000 * 3600))
+											+ "km/h");
 							finished += 1;
 						}
 					}
@@ -365,6 +372,26 @@ public class Control {
 					}
 					System.out.println("\n");
 				} while (!race.isTerminatedRace());
+
+				// Give points to the cars and garages
+				Collections.sort(race.getCarList(), new CarComparator());
+				System.out.println("Standings: ");
+				int carScore = 5;
+				int garageScore = 20;
+				for (Car c : race.getCarList()) {
+					if (carScore > 0) {
+						int newScore = c.getScore() + carScore;
+						c.setScore(newScore);
+						System.out.println(c.getBrand() + " " + c.getModel() + " wins " + carScore
+								+ " points, total points: " + c.getScore());
+						carScore -= 2;
+					}
+					if (garageScore > 0) {
+						int newGarageScore = c.getGarage().getScore() + garageScore;
+						c.getGarage().setScore(newGarageScore);
+						garageScore -= 10;
+					}
+				}
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
 			}
@@ -482,7 +509,7 @@ public class Control {
 				int select = scan.nextInt();
 				Garage garage = garages.get(select - 1);
 				boolean isIn = false;
-				for (Garage g : garages) {
+				for (Garage g : race.getGarageList()) {
 					String name = g.getGarageName();
 					if (name.equals(garage.getGarageName())) {
 						isIn = true;
@@ -490,6 +517,11 @@ public class Control {
 				}
 				if (!isIn) {
 					race.getGarageList().add(garage);
+					for (Car c : garage.getCarList()) {
+						race.getCarList().add(c);
+					}
+				} else {
+					System.out.println("Garage is already in the race");
 				}
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
@@ -507,6 +539,9 @@ public class Control {
 				int select = scan.nextInt();
 				Garage garage = garages.get(select - 1);
 				race.getGarageList().remove(garage);
+				for (Car c : garage.getCarList()) {
+					race.getCarList().remove(c);
+				}
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
 			}
@@ -517,9 +552,16 @@ public class Control {
 
 	private void showRaceDetails(Race race) {
 		System.out.println(race.getRaceName() + " - Lap length: " + race.getLapLength() + " - Laps: " + race.getLaps()
-				+ "\n Garages:");
+				+ "\nGarages:");
+		int i = 1;
+		int j = 1;
 		for (Garage g : race.getGarageList()) {
-			System.out.println(g.getGarageName());
+			System.out.println(i + ". " + g.getGarageName() + "\n\tCars of the garage: ");
+			i++;
+			for (Car c : g.getCarList()) {
+				System.out.println("\t" + j + ". " + c.getBrand() + " " + c.getModel());
+				j++;
+			}
 		}
 	}
 
