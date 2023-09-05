@@ -1,7 +1,11 @@
 package es.darioabuin.control;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import es.darioabuin.util.CarComparator;
 
 public class Race {
 	private String raceName;
@@ -80,6 +84,53 @@ public class Race {
 			c.setFinished(false);
 			c.setTotalRaceTime(0);
 			c.setIteration(0);
+		}
+	}
+	
+	public void startRace(Race race) {
+		DecimalFormat dfor = new DecimalFormat("#.00");
+		do {
+			int finished = 0;
+			for (Car c : race.getCarList()) {
+				if (!c.isFinished()) {
+					c.run(race.getTotalLength());
+					System.out
+							.println(c.getModel() + " " + c.getSpeedometer() + "km/h " + c.getDistance() + "m");
+				} else {
+					int minutes = (int) (c.getTotalRaceTime() / 60);
+					int seconds = (int) (c.getTotalRaceTime() % 60);
+					System.out.println(
+							c.getModel() + " finished the race in " + minutes + ":" + seconds + "; average: "
+									+ dfor.format((race.getTotalLength() / c.getTotalRaceTime() / 1000 * 3600))
+									+ "km/h");
+					finished += 1;
+				}
+			}
+			if (finished == race.getCarList().size()) {
+				race.setTerminatedRace(true);
+			}
+			System.out.println("\n");
+		} while (!race.isTerminatedRace());
+	}
+	
+	public void givePoints(Race race) {
+		Collections.sort(race.getCarList(), new CarComparator());
+		System.out.println("Standings: ");
+		int carScore = 5;
+		int garageScore = 20;
+		for (Car c : race.getCarList()) {
+			if (carScore > 0) {
+				int newScore = c.getScore() + carScore;
+				c.setScore(newScore);
+				System.out.println(c.getBrand() + " " + c.getModel() + " wins " + carScore + " points, total points: "
+						+ c.getScore());
+				carScore -= 2;
+			}
+			if (garageScore > 0) {
+				int newGarageScore = c.getGarage().getScore() + garageScore;
+				c.getGarage().setScore(newGarageScore);
+				garageScore -= 10;
+			}
 		}
 	}
 }

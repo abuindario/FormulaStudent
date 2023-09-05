@@ -12,6 +12,7 @@ import es.darioabuin.util.CarComparator;
 public class Control {
 	public List<Garage> garages = new ArrayList<Garage>();
 	public List<Race> races = new ArrayList<Race>();
+	public List<Tournament> tournaments = new ArrayList<Tournament>();
 
 	public static void main(String[] args) {
 		Control control = new Control();
@@ -52,6 +53,16 @@ public class Control {
 		race1.registerCarInRace(car3);
 		race1.registerCarInRace(car4);
 
+		// Create new tournament
+		Tournament tour1 = new Tournament("Piston Cup");
+
+		// Add tournament to tournament's list
+		control.tournaments.add(tour1);
+
+		// Add races to tournament
+		tour1.getTournamentRaces().add(race1);
+		tour1.getTournamentRaces().add(race2);
+
 		control.start();
 	}
 
@@ -82,7 +93,7 @@ public class Control {
 				this.raceMenu();
 				break;
 			case 3:
-				// this.tournamentMenu();
+				this.tournamentMenu();
 				break;
 			case 99:
 				break;
@@ -281,7 +292,7 @@ public class Control {
 			case 0:
 				break;
 			case 1:
-				this.listRaces();
+				this.getRaces();
 				break;
 			case 2:
 				this.showRaceDetails();
@@ -307,7 +318,7 @@ public class Control {
 		} while (opt != 0);
 	}
 
-	private void listRaces() {
+	private void getRaces() {
 		int i = 1;
 		for (Race r : races) {
 			System.out.println(i + ". " + r.getRaceName() + ", Length: " + r.getLapLength() + ", Laps: " + r.getLaps());
@@ -317,7 +328,7 @@ public class Control {
 
 	private void showRaceDetails() {
 		System.out.println("Select one option: ");
-		listRaces();
+		getRaces();
 		Scanner scan = new Scanner(System.in);
 		int select = 0;
 		try {
@@ -343,56 +354,17 @@ public class Control {
 	}
 
 	private void startRace() {
-		listRaces();
+		getRaces();
 		System.out.println("Select a race: ");
 		Scanner scan = new Scanner(System.in);
-		DecimalFormat dfor = new DecimalFormat("#.00");
 		try {
 			int select = scan.nextInt();
 			try {
 				Race race = races.get(select - 1);
-				race.resetRace(race);
-				do {
-					int finished = 0;
-					for (Car c : race.getCarList()) {
-						if (!c.isFinished()) {
-							c.run(race.getTotalLength());
-							System.out
-									.println(c.getModel() + " " + c.getSpeedometer() + "km/h " + c.getDistance() + "m");
-						} else {
-							int minutes = (int) (c.getTotalRaceTime() / 60);
-							int seconds = (int) (c.getTotalRaceTime() % 60);
-							System.out.println(
-									c.getModel() + " finished the race in " + minutes + ":" + seconds + "; average: "
-											+ dfor.format((race.getTotalLength() / c.getTotalRaceTime() / 1000 * 3600))
-											+ "km/h");
-							finished += 1;
-						}
-					}
-					if (finished == race.getCarList().size()) {
-						race.setTerminatedRace(true);
-					}
-					System.out.println("\n");
-				} while (!race.isTerminatedRace());
-
-				// Give points to the cars and garages
-				Collections.sort(race.getCarList(), new CarComparator());
-				System.out.println("Standings: ");
-				int carScore = 5;
-				int garageScore = 20;
-				for (Car c : race.getCarList()) {
-					if (carScore > 0) {
-						int newScore = c.getScore() + carScore;
-						c.setScore(newScore);
-						System.out.println(c.getBrand() + " " + c.getModel() + " wins " + carScore
-								+ " points, total points: " + c.getScore());
-						carScore -= 2;
-					}
-					if (garageScore > 0) {
-						int newGarageScore = c.getGarage().getScore() + garageScore;
-						c.getGarage().setScore(newGarageScore);
-						garageScore -= 10;
-					}
+				if (!race.getCarList().isEmpty()) {
+					race.resetRace(race);
+					race.startRace(race);
+					race.givePoints(race);
 				}
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
@@ -419,7 +391,7 @@ public class Control {
 	}
 
 	private void editRace() {
-		listRaces();
+		getRaces();
 		Race race = null;
 		Scanner scan = new Scanner(System.in);
 		try {
@@ -583,12 +555,138 @@ public class Control {
 	}
 
 	private void removeRace() {
-		listRaces();
+		getRaces();
 		Scanner scan = new Scanner(System.in);
 		try {
 			int select = scan.nextInt();
 			try {
 				races.remove(select - 1);
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
+	}
+
+	private void tournamentMenu() {
+		int opt;
+		do {
+			System.out.println("\n=======================");
+			System.out.println("== Manage tournaments ==");
+			System.out.println("=======================");
+			System.out.println("1. Get tournaments");
+			System.out.println("2. Show tournament details");
+			System.out.println("3. Start tournament");
+			System.out.println("4. Add tournament");
+			System.out.println("5. Edit tournament");
+			System.out.println("6. Remove tournament");
+			System.out.println("0. Go back");
+			Scanner scan = new Scanner(System.in);
+			opt = scan.nextInt();
+			switch (opt) {
+			case 0:
+				break;
+			case 1:
+				this.getTournaments();
+				break;
+			case 2:
+				this.showTournamentDetails();
+				break;
+			case 3:
+				this.startTournament();
+				break;
+			case 4:
+				this.addTournament();
+				break;
+			case 5:
+				// this.editTournament();
+				break;
+			case 6:
+				this.removeTournament();
+				break;
+			default:
+				System.out.println("Invalid option");
+				break;
+			}
+		} while (opt != 0);
+	}
+
+	private void getTournaments() {
+		int i = 1;
+		for (Tournament t : tournaments) {
+			System.out.println(i + ". " + t.getTournamentName());
+			i++;
+		}
+	}
+
+	private void showTournamentDetails() {
+		getTournaments();
+		Scanner scan = new Scanner(System.in);
+		Tournament t = null;
+		try {
+			int select = scan.nextInt();
+			try {
+				t = tournaments.get(select - 1);
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
+		try {
+			System.out.println(t.getTournamentName() + ": \n");
+			int i = 1;
+			for (Race r : t.getTournamentRaces()) {
+				System.out.println("\t" + i + ". '" + r.getRaceName() + "', Length:" + r.getTotalLength() + "m.");
+			}
+		} catch (NullPointerException e) {
+
+		}
+	}
+
+	private void startTournament() {
+		getTournaments();
+		Tournament t = null;
+		Scanner scan = new Scanner(System.in);
+		try {
+			int select = scan.nextInt();
+			try {
+				t = tournaments.get(select - 1);
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
+		try {
+			for (Race r : t.getTournamentRaces()) {
+				if (!r.getCarList().isEmpty()) {
+					r.resetRace(r);
+					r.startRace(r);
+					r.givePoints(r);
+				}
+			}
+		} catch (NullPointerException e) {
+
+		}
+	}
+
+	private void addTournament() {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter tournament's name: ");
+		String name = scan.nextLine();
+		Tournament tournament = new Tournament(name);
+		tournaments.add(tournament);
+	}
+
+	private void removeTournament() {
+		getTournaments();
+		Scanner scan = new Scanner(System.in);
+		try {
+			int select = scan.nextInt();
+			try {
+				tournaments.remove(select - 1);
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
 			}
