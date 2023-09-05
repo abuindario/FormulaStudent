@@ -245,6 +245,7 @@ public class Control {
 			i++;
 		}
 		int select = scan.nextInt();
+		removeCarFromRace(garage.getCarList().get(select - 1));
 		garage.getCarList().remove(select - 1);
 	}
 
@@ -253,6 +254,7 @@ public class Control {
 		listGarage();
 		Scanner scan = new Scanner(System.in);
 		int select = scan.nextInt();
+		removeGarageFromRace(garages.get(select - 1));
 		garages.remove(select - 1);
 	}
 
@@ -435,7 +437,7 @@ public class Control {
 					System.out.println("4. Add garage to race");
 					System.out.println("5. Remove garage from race");
 					System.out.println("6. Show race details");
-					System.out.println("0. Volver");
+					System.out.println("0. Go back");
 					opt = scan.nextInt();
 					switch (opt) {
 					case 0:
@@ -547,6 +549,21 @@ public class Control {
 			}
 		} catch (InputMismatchException e) {
 			System.out.println("You must enter a number");
+		}
+	}
+
+	private void removeGarageFromRace(Garage g) {
+		for (Race r : races) {
+			r.getGarageList().remove(g);
+		}
+		for (Car c : g.getCarList()) {
+			removeCarFromRace(c);
+		}
+	}
+
+	private void removeCarFromRace(Car c) {
+		for (Race r : races) {
+			r.getCarList().remove(c);
 		}
 	}
 
