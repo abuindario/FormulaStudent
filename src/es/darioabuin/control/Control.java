@@ -1,13 +1,9 @@
 package es.darioabuin.control;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-
-import es.darioabuin.util.CarComparator;
 
 public class Control {
 	public List<Garage> garages = new ArrayList<Garage>();
@@ -80,6 +76,7 @@ public class Control {
 			try {
 				opt = scan.nextInt();
 			} catch (InputMismatchException e) {
+				opt = 99;
 				System.out.println("You must enter a number");
 			}
 			switch (opt) {
@@ -120,6 +117,7 @@ public class Control {
 			try {
 				opt = scan.nextInt();
 			} catch (InputMismatchException e) {
+				opt = 99;
 				System.out.println("You must enter a number");
 			}
 			switch (opt) {
@@ -286,6 +284,7 @@ public class Control {
 				Scanner scan = new Scanner(System.in);
 				opt = scan.nextInt();
 			} catch (InputMismatchException e) {
+				opt = 99;
 				System.out.println("You must enter a number");
 			}
 			switch (opt) {
@@ -327,7 +326,7 @@ public class Control {
 	}
 
 	private void showRaceDetails() {
-		System.out.println("Select one option: ");
+		System.out.println("Select an option: ");
 		getRaces();
 		Scanner scan = new Scanner(System.in);
 		int select = 0;
@@ -570,7 +569,7 @@ public class Control {
 	}
 
 	private void tournamentMenu() {
-		int opt;
+		int opt = 99;
 		do {
 			System.out.println("\n=======================");
 			System.out.println("== Manage tournaments ==");
@@ -583,7 +582,12 @@ public class Control {
 			System.out.println("6. Remove tournament");
 			System.out.println("0. Go back");
 			Scanner scan = new Scanner(System.in);
+			try {
 			opt = scan.nextInt();
+			} catch(InputMismatchException e) {
+				opt = 99;
+				System.out.println("You must enter a number");
+			}
 			switch (opt) {
 			case 0:
 				break;
@@ -600,10 +604,12 @@ public class Control {
 				this.addTournament();
 				break;
 			case 5:
-				// this.editTournament();
+				this.editTournament();
 				break;
 			case 6:
 				this.removeTournament();
+				break;
+			case 99: 
 				break;
 			default:
 				System.out.println("Invalid option");
@@ -678,6 +684,60 @@ public class Control {
 		String name = scan.nextLine();
 		Tournament tournament = new Tournament(name);
 		tournaments.add(tournament);
+	}
+
+	private void editTournament() {
+		Scanner scan = new Scanner(System.in);
+		Tournament t = null;
+		getTournaments();
+		try {
+			int select = scan.nextInt();
+			try {
+				t = tournaments.get(select - 1);
+
+				int opt = 99;
+				do {
+					System.out.println("\n======================");
+					System.out.println("== Manage tournament \"" + t.getTournamentName() + "\" ==");
+					System.out.println("======================");
+					System.out.println("1. Modify tournament name");
+					System.out.println("2. Add race to tournament");
+					System.out.println("3. Remove race from tournament");
+					System.out.println("4. Add garage to tournament");
+					System.out.println("5. Remove garage from tournament");
+					System.out.println("0. Go back");
+					opt = scan.nextInt();
+					switch (opt) {
+					case 0:
+						break;
+					case 1:
+						// this.editTournamentName(t);
+						break;
+					case 2:
+						// this.addRaceToTournament(t);
+						break;
+					case 3:
+						// this.removeRaceFromTournament(t);
+						break;
+					case 4:
+						// this.addGarageToTournament(t);
+						break;
+					case 5:
+						// this.removeGarageFromTournament(t);
+						break;
+					case 99:
+						break;
+					default:
+						System.out.println("Invalid option");
+						break;
+					}
+				} while (opt != 0);
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
 	}
 
 	private void removeTournament() {
