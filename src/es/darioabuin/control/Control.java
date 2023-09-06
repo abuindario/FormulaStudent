@@ -35,7 +35,7 @@ public class Control {
 
 		// Race creation: name + length of each lap + number of laps
 		Race race1 = new Race("Race 1", 2000, 3);
-		Race race2 = new Race("Race 2", 1500, 4);
+		Race race2 = new Race("Race 2", 1400, 4);
 
 		// Add races to race's list
 		control.races.add(race1);
@@ -58,6 +58,10 @@ public class Control {
 		// Add races to tournament
 		tour1.getTournamentRaces().add(race1);
 		tour1.getTournamentRaces().add(race2);
+		
+		// Add garages to tournament
+		tour1.getTournamentGarages().add(garage1);
+		tour1.getTournamentGarages().add(garage2);
 
 		control.start();
 	}
@@ -583,8 +587,8 @@ public class Control {
 			System.out.println("0. Go back");
 			Scanner scan = new Scanner(System.in);
 			try {
-			opt = scan.nextInt();
-			} catch(InputMismatchException e) {
+				opt = scan.nextInt();
+			} catch (InputMismatchException e) {
 				opt = 99;
 				System.out.println("You must enter a number");
 			}
@@ -609,7 +613,7 @@ public class Control {
 			case 6:
 				this.removeTournament();
 				break;
-			case 99: 
+			case 99:
 				break;
 			default:
 				System.out.println("Invalid option");
@@ -634,20 +638,34 @@ public class Control {
 			int select = scan.nextInt();
 			try {
 				t = tournaments.get(select - 1);
+				System.out.println(t.getTournamentName() + ": \n");
+				int i = 1;
+				if (!t.getTournamentRaces().isEmpty()) {
+					System.out.println("Races of the tournament: ");
+					for (Race r : t.getTournamentRaces()) {
+						System.out
+								.println("\t" + i + ". '" + r.getRaceName() + "', Length:" + r.getTotalLength() + "m.");
+						i++;
+					}
+				}
+				if (!t.getTournamentGarages().isEmpty()) {
+					i = 1;
+					System.out.println("Garages of the tournament: ");
+					for (Garage g : t.getTournamentGarages()) {
+						int j = 1;
+						System.out.println("\t" + i + ". " + g.getGarageName());
+						for (Car c : g.getCarList()) {
+							System.out.println("\t\t" + j + ". " + c.getBrand() + " " + c.getModel());
+							j++;
+						}
+						i++;
+					}
+				}
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
 			}
 		} catch (InputMismatchException e) {
 			System.out.println("You must enter a number");
-		}
-		try {
-			System.out.println(t.getTournamentName() + ": \n");
-			int i = 1;
-			for (Race r : t.getTournamentRaces()) {
-				System.out.println("\t" + i + ". '" + r.getRaceName() + "', Length:" + r.getTotalLength() + "m.");
-			}
-		} catch (NullPointerException e) {
-
 		}
 	}
 
@@ -694,7 +712,6 @@ public class Control {
 			int select = scan.nextInt();
 			try {
 				t = tournaments.get(select - 1);
-
 				int opt = 99;
 				do {
 					System.out.println("\n======================");
@@ -711,19 +728,19 @@ public class Control {
 					case 0:
 						break;
 					case 1:
-						// this.editTournamentName(t);
+						this.editTournamentName(t);
 						break;
 					case 2:
-						// this.addRaceToTournament(t);
+						this.addRaceToTournament(t);
 						break;
 					case 3:
-						// this.removeRaceFromTournament(t);
+						this.removeRaceFromTournament(t);
 						break;
 					case 4:
-						// this.addGarageToTournament(t);
+						this.addGarageToTournament(t);
 						break;
 					case 5:
-						// this.removeGarageFromTournament(t);
+						this.removeGarageFromTournament(t);
 						break;
 					case 99:
 						break;
@@ -732,6 +749,107 @@ public class Control {
 						break;
 					}
 				} while (opt != 0);
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
+	}
+
+	private void editTournamentName(Tournament tournament) {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter new tournament name: ");
+		String newName = scan.nextLine();
+		tournament.setTournamentName(newName);
+	}
+
+	private void addRaceToTournament(Tournament tournament) {
+		int i = 1;
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Select one option: ");
+		for (Race r : races) {
+			System.out.println(i + ": " + r.getRaceName());
+			i++;
+		}
+		try {
+			int select = scan.nextInt();
+			try {
+				tournament.getTournamentRaces().add(races.get(select - 1));
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
+	}
+
+	private void removeRaceFromTournament(Tournament tournament) {
+		int i = 1;
+		Scanner scan = new Scanner(System.in);
+		for (Race r : tournament.getTournamentRaces()) {
+			System.out.println(i + ". " + r.getRaceName());
+			i++;
+		}
+		try {
+			int select = scan.nextInt();
+			try {
+				tournament.getTournamentRaces().remove(select - 1);
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
+	}
+
+	private void addGarageToTournament(Tournament tournament) {
+		int i = 1;
+		Scanner scan = new Scanner(System.in);
+		boolean isIn = false;
+		System.out.println("Select one option: ");
+		for (Garage g : garages) {
+			System.out.println(i + ": " + g.getGarageName());
+			i++;
+		}
+		try {
+			int select = scan.nextInt();
+			try {
+				Garage garage = garages.get(select - 1);
+				if (tournament.getTournamentGarages().isEmpty()) {
+					tournament.getTournamentGarages().add(garage);
+					isIn = true;
+				} else {
+					for (Garage g : tournament.getTournamentGarages()) {
+						if (garage.getGarageName().equals(g.getGarageName())) {
+							isIn = true;
+							System.out.println("This garage is already in this tournament");
+						} else {
+						}
+					}
+				}
+				if(!isIn) {
+					tournament.getTournamentGarages().add(garage);
+				}
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
+	}
+
+	private void removeGarageFromTournament(Tournament tournament) {
+		int i = 1;
+		Scanner scan = new Scanner(System.in);
+		for (Garage g : tournament.getTournamentGarages()) {
+			System.out.println(i + ". " + g.getGarageName());
+			i++;
+		}
+		try {
+			int select = scan.nextInt();
+			try {
+				tournament.getTournamentGarages().remove(select - 1);
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
 			}
