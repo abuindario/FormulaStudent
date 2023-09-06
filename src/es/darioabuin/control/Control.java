@@ -249,9 +249,17 @@ public class Control {
 			System.out.println(i + ". " + c.getBrand() + " " + c.getModel());
 			i++;
 		}
-		int select = scan.nextInt();
-		removeCarFromRace(garage.getCarList().get(select - 1));
-		garage.getCarList().remove(select - 1);
+		try {
+			int select = scan.nextInt();
+			try {
+			removeCarFromRace(garage.getCarList().get(select - 1));
+			garage.getCarList().remove(select - 1);
+			} catch (IndexOutOfBoundsException e) { 
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
 	}
 
 	private void removeGarage() {
