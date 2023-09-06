@@ -34,20 +34,12 @@ public class Control {
 		garage2.registerCarInGarage(car4, garage2);
 
 		// Race creation: name + length of each lap + number of laps
-		Race race1 = new Race("Race 1", 2000, 3);
-		Race race2 = new Race("Race 2", 1400, 4);
+		Race race1 = new Race("Silverglass", 2000, 3);
+		Race race2 = new Race("Circuit of Manzo", 1400, 4);
 
 		// Add races to race's list
 		control.races.add(race1);
 		control.races.add(race2);
-
-		// Register garages and cars in race
-		race1.registerGarageInRace(garage1);
-		race1.registerGarageInRace(garage2);
-		race1.registerCarInRace(car1);
-		race1.registerCarInRace(car2);
-		race1.registerCarInRace(car3);
-		race1.registerCarInRace(car4);
 
 		// Create new tournament
 		Tournament tour1 = new Tournament("Piston Cup");
@@ -58,7 +50,7 @@ public class Control {
 		// Add races to tournament
 		tour1.getTournamentRaces().add(race1);
 		tour1.getTournamentRaces().add(race2);
-		
+
 		// Add garages to tournament
 		tour1.getTournamentGarages().add(garage1);
 		tour1.getTournamentGarages().add(garage2);
@@ -677,22 +669,39 @@ public class Control {
 			int select = scan.nextInt();
 			try {
 				t = tournaments.get(select - 1);
+				// Remove all garages from races
+				for (Garage g : garages) {
+					this.removeGarageFromRace(g);
+				}
+				for (Race r : t.getTournamentRaces()) {
+					// Add garages from the tournament to the race
+					r.getGarageList().addAll(t.getTournamentGarages());
+					// Add cars from the garages of the tournament to the race
+					for (Garage g : r.getGarageList()) {
+						r.getCarList().addAll(g.getCarList());
+					}
+					System.out.println("Start of race '" + r.getRaceName() + "' \n === * ===");
+					if (!r.getCarList().isEmpty()) {
+						r.resetRace(r);
+						r.startRace(r);
+						r.givePoints(r);
+					}
+					if ((t.getTournamentRaces().indexOf(r) + 1) < t.getTournamentRaces().size()) {
+						System.out.println("\nPress any button and enter to continue with the tournament");
+						scan.next();
+					}
+				}
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
 			}
 		} catch (InputMismatchException e) {
 			System.out.println("You must enter a number");
-		}
-		try {
-			for (Race r : t.getTournamentRaces()) {
-				if (!r.getCarList().isEmpty()) {
-					r.resetRace(r);
-					r.startRace(r);
-					r.givePoints(r);
-				}
+		} finally {
+			// Remove all garages and cars from races, so if we run later a single race
+			// those garages and cars are not registered in the race
+			for (Garage g : garages) {
+				this.removeGarageFromRace(g);
 			}
-		} catch (NullPointerException e) {
-
 		}
 	}
 
@@ -828,7 +837,7 @@ public class Control {
 						}
 					}
 				}
-				if(!isIn) {
+				if (!isIn) {
 					tournament.getTournamentGarages().add(garage);
 				}
 			} catch (IndexOutOfBoundsException e) {
