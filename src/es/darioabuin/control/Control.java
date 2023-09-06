@@ -258,9 +258,20 @@ public class Control {
 		System.out.println("Remove garage: ");
 		listGarage();
 		Scanner scan = new Scanner(System.in);
-		int select = scan.nextInt();
-		removeGarageFromRace(garages.get(select - 1));
-		garages.remove(select - 1);
+		try {
+			int select = scan.nextInt();
+			try {
+				removeGarageFromRace(garages.get(select - 1));
+				for (Tournament t : tournaments) {
+					t.getTournamentGarages().remove(garages.get(select - 1));
+				}
+				garages.remove(select - 1);
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("Invalid option");
+			}
+		} catch (InputMismatchException e) {
+			System.out.println("You must enter a number");
+		}
 	}
 
 	private void raceMenu() {
