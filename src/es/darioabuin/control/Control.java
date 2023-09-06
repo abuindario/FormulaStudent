@@ -712,18 +712,17 @@ public class Control {
 						System.out.println("\nPress any button and enter to continue with the tournament");
 						scan.next();
 					}
+					// Remove all garages and cars from races, so if we run later a single race
+					// those garages and cars are not registered in the race
+					for (Garage g : garages) {
+						this.removeGarageFromRace(g);
+					}
 				}
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
 			}
 		} catch (InputMismatchException e) {
 			System.out.println("You must enter a number");
-		} finally {
-			// Remove all garages and cars from races, so if we run later a single race
-			// those garages and cars are not registered in the race
-			for (Garage g : garages) {
-				this.removeGarageFromRace(g);
-			}
 		}
 	}
 
