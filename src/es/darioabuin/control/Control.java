@@ -574,6 +574,9 @@ public class Control {
 		try {
 			int select = scan.nextInt();
 			try {
+				for (Tournament t : tournaments) {
+					t.getTournamentRaces().remove(races.get(select - 1));
+				}
 				races.remove(select - 1);
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
