@@ -1,7 +1,6 @@
 # FormulaStudent
 
-Small project developed in Java designed to run in the IDE's console. It works like a basic control manager of cars, garages, races and tournaments. 
-It gives the user the chance to create his own cars and garages, and to design simple races and even tournaments. Sample cars, garages, races and tournaments are provided by default.
+Small project developed in Java designed to run in the IDE's console. Control manager of cars, garages, races and tournaments. It gives the user the chance to create his own cars and garages, and to design simple races and even tournaments. Sample cars, garages, races and tournaments are provided by default.
 
 To use this program, the user must clone the repository locally, and then execute it with his default IDE (running this program in the Eclipse IDE is recommended).
 
