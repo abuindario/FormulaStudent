@@ -252,9 +252,9 @@ public class Control {
 		try {
 			int select = scan.nextInt();
 			try {
-			removeCarFromRace(garage.getCarList().get(select - 1));
-			garage.getCarList().remove(select - 1);
-			} catch (IndexOutOfBoundsException e) { 
+				removeCarFromRace(garage.getCarList().get(select - 1));
+				garage.getCarList().remove(select - 1);
+			} catch (IndexOutOfBoundsException e) {
 				System.out.println("Invalid option");
 			}
 		} catch (InputMismatchException e) {
@@ -598,6 +598,7 @@ public class Control {
 			System.out.println("4. Add tournament");
 			System.out.println("5. Edit tournament");
 			System.out.println("6. Remove tournament");
+			System.out.println("7. Show score");
 			System.out.println("0. Go back");
 			Scanner scan = new Scanner(System.in);
 			try {
@@ -627,6 +628,8 @@ public class Control {
 			case 6:
 				this.removeTournament();
 				break;
+			case 7:
+				this.showScore();
 			case 99:
 				break;
 			default:
@@ -667,9 +670,11 @@ public class Control {
 					System.out.println("Garages of the tournament: ");
 					for (Garage g : t.getTournamentGarages()) {
 						int j = 1;
-						System.out.println("\t" + i + ". " + g.getGarageName());
+						System.out
+								.println("\t" + i + ". " + g.getGarageName() + " - " + g.getScore() + " garage points");
 						for (Car c : g.getCarList()) {
-							System.out.println("\t\t" + j + ". " + c.getBrand() + " " + c.getModel());
+							System.out.println("\t\t" + j + ". " + c.getBrand() + " " + c.getModel() + " - "
+									+ c.getScore() + " points");
 							j++;
 						}
 						i++;
@@ -900,6 +905,23 @@ public class Control {
 			}
 		} catch (InputMismatchException e) {
 			System.out.println("You must enter a number");
+		}
+	}
+
+	private void showScore() {
+		if(!garages.isEmpty()) {
+		int i = 1;
+		System.out.println("Garages: ");
+		for (Garage g : garages) {
+			int j = 1;
+			System.out.println(i + ". " + g.getGarageName() + " - " + g.getScore() + " garage points");
+			for (Car c : g.getCarList()) {
+				System.out.println(
+						"\t" + j + ". " + c.getBrand() + " " + c.getModel() + " - " + c.getScore() + " points");
+				j++;
+			}
+			i++;
+		}
 		}
 	}
 }
