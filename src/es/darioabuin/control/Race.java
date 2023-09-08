@@ -88,7 +88,8 @@ public class Race {
 	}
 	
 	public void startRace(Race race) {
-		DecimalFormat dfor = new DecimalFormat("#.00");
+		DecimalFormat dfor = new DecimalFormat("##.00");
+		DecimalFormat dforsec = new DecimalFormat("00");
 		do {
 			int finished = 0;
 			for (Car c : race.getCarList()) {
@@ -98,9 +99,9 @@ public class Race {
 							.println(c.getModel() + " " + c.getSpeedometer() + "km/h " + c.getDistance() + "m");
 				} else {
 					int minutes = (int) (c.getTotalRaceTime() / 60);
-					int seconds = (int) (c.getTotalRaceTime() % 60);
+					double seconds = (c.getTotalRaceTime() % 60);
 					System.out.println(
-							c.getModel() + " finished the race in " + minutes + ":" + seconds + "; average: "
+							c.getModel() + " finished the race in " + dforsec.format(minutes) + ":" + dforsec.format(seconds) + "; average: "
 									+ dfor.format((race.getTotalLength() / c.getTotalRaceTime() / 1000 * 3600))
 									+ "km/h");
 					finished += 1;
