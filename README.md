@@ -29,4 +29,6 @@ The program is divided in 3 sections:
   4. Create new tournament (providing its name).
   5. Edit a tournament from the list. It allows the user to modify its name, and add or remove a race or a garage from the tournament.
   6. Removing an existing tournament.
-  7. Show the score of each garage and car, despite of being registered in any tournament or not. 
+  7. Show the score of each garage and car, despite of being registered in any tournament or not.
+
+Please, if any error is detected while running this program, let me know: darioabuin@outlook.com 
